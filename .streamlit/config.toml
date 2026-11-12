@@ -1,0 +1,18 @@
+[server]
+enableStaticServing = true
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+base = "light"
+primaryColor = "#1F6F8B"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F2F5F6"
+textColor = "#1B2A32"
+font = "Instrument Sans, sans-serif"
+
+[[theme.fontFaces]]
+family = "Instrument Sans"
+url = "app/static/InstrumentSans.ttf"
+weight = "400 700"
