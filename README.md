@@ -3,7 +3,7 @@
 An analysis of a marketplace's seller-acquisition funnel, from first contact to first sale.
 Built on Olist's public data: 8,000 leads, 842 signed sellers and the orders they went on to receive.
 
-**Live dashboard:** _add your Streamlit link here_
+**Live dashboard:** https://etemtincan-seller-acquisition-funnel-app-yerm8p.streamlit.app
 
 ![Dashboard preview](assets/preview.png)
 

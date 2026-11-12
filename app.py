@@ -12,7 +12,9 @@ from plotly.subplots import make_subplots
 from funnel.db import CUTOFF, connect, read_sql, run
 
 AUTHOR = "Etem Tincan"
-REPO_URL = "https://github.com/ETOSKI31/seller-acquisition-funnel"
+REPO_URL = "https://github.com/EtemTincan/seller-acquisition-funnel"
+GITHUB_URL = "https://github.com/EtemTincan"
+LINKEDIN_URL = ""  # paste your LinkedIn profile link here to show it on the page
 
 # Design tokens. One blue for every data mark, a lighter tint for small samples,
 # ochre reserved for the few things the reader must not miss.
@@ -138,6 +140,8 @@ st.html(f"""
   .actions .do {{ font-size: 1.14rem; font-weight: 600; line-height: 1.35; margin: 0 0 .3rem; }}
   .actions .why {{ font-size: 1rem; line-height: 1.58; color: {MUTED}; margin: 0; max-width: 66ch; }}
 
+  .author {{ margin-top: 4.5rem; padding-top: 1.6rem; border-top: 2px solid {INK}; }}
+  .author .name {{ font-size: 1.3rem; font-weight: 600; letter-spacing: -0.012em; margin: 0 0 .5rem; }}
   .note {{ font-size: .92rem; line-height: 1.55; color: {MUTED}; max-width: 70ch; }}
   .settings {{ margin-top: 4rem; padding: 1.1rem 1.3rem .4rem; background: {PANEL}; border-radius: 6px; }}
   [data-testid="stExpander"] details {{ border: 0; border-top: 1px solid {RULE}; border-radius: 0; }}
@@ -167,8 +171,9 @@ st.html(f"""
 <p class="lede">Olist, a Brazilian marketplace, published a year of its seller-acquisition funnel:
 {f.leads:,.0f} businesses that asked to sell on the platform, the {f.signed:,.0f} that signed, and every
 order those sellers went on to receive. This analysis follows each lead from first contact to first sale.</p>
-<p class="byline">Analysis by {AUTHOR}. SQL on DuckDB, charts in Python.
-<a href="{REPO_URL}">Code and queries on GitHub</a></p>
+<p class="byline">By <b style="color:{INK}; font-weight:600">{AUTHOR}</b>, growth and business development.
+SQL on DuckDB, charts in Python.
+<a href="{REPO_URL}" target="_blank" rel="noopener">Code and queries on GitHub</a></p>
 
 <div class="funnel" role="img"
      aria-label="Funnel: {f.leads:,.0f} leads, {f.signed:,.0f} signed, {pct(act_rate)} of signed sellers sold within 90 days">
@@ -501,5 +506,20 @@ cost per lead, CAC and return on ad spend are out of reach. The findings rank ch
 they bring, which is half of a budget decision. Differences between channels are associations, and the mix of
 seller profiles each channel attracts may explain part of them.</p>
 <p class="note"><b style="color:{INK}">Reproduce it.</b> Every figure on this page comes from the SQL files in
-the <a href="{REPO_URL}" style="color:{BLUE}">repository</a>, shown under each chart.</p>
+the <a href="{REPO_URL}" target="_blank" rel="noopener" style="color:{BLUE}">repository</a>, shown under each chart.</p>
+""")
+
+# ------------------------------------------------------------------ author ---
+
+links = [f'<a href="{GITHUB_URL}" target="_blank" rel="noopener">GitHub</a>']
+if LINKEDIN_URL:
+    links.insert(0, f'<a href="{LINKEDIN_URL}" target="_blank" rel="noopener">LinkedIn</a>')
+st.html(f"""
+<div class="author">
+  <p class="name">{AUTHOR}</p>
+  <p class="prose" style="margin-bottom:.5rem">I work in growth and business development, across partnerships,
+  affiliate and performance marketing. This project puts the questions I ask of a partner funnel to a public
+  dataset: where leads come from, which ones sign, and which of those go on to produce revenue.</p>
+  <p class="byline" style="margin:0">{" and ".join(links)}</p>
+</div>
 """)
