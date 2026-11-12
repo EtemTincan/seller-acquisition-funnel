@@ -14,21 +14,27 @@ from funnel.db import CUTOFF, connect, read_sql, run
 AUTHOR = "Etem Tincan"
 REPO_URL = "https://github.com/EtemTincan/seller-acquisition-funnel"
 GITHUB_URL = "https://github.com/EtemTincan"
-LINKEDIN_URL = ""  # paste your LinkedIn profile link here to show it on the page
+LINKEDIN_URL = "https://www.linkedin.com/in/etem-tincan-4a23671bb/"
 
 # Design tokens. One blue for every data mark, a lighter tint for small samples,
 # ochre reserved for the few things the reader must not miss.
-INK = "#1B2A32"
-MUTED = "#5F6E76"
-RULE = "#DDE3E6"
-PANEL = "#F2F5F6"
-BLUE = "#1F6F8B"
-BLUE_TINT = "#A9C9D4"
-OCHRE = "#B8730F"
 FONT = "Instrument Sans, Helvetica Neue, Arial, sans-serif"
 SMALL_SAMPLE = 30  # below this many observed sellers a rate is too noisy to rank on
 
 st.set_page_config(page_title="Seller acquisition funnel", layout="centered")
+
+# Design tokens, one set per colour scheme. The page follows the visitor's
+# system setting (see .streamlit/config.toml); these keep charts and custom
+# HTML in step with it.
+DARK = st.context.theme.type == "dark"
+if DARK:
+    BG, INK, MUTED, RULE, PANEL = "#10171A", "#E4EBEE", "#9BABB3", "#2B383E", "#1A2327"
+    BLUE, BLUE_TINT, OCHRE = "#5AAEC9", "#2F5868", "#E3A33E"
+    HEAT, AREA, GRID = ["#1B2B32", "#3E8CA6"], "rgba(90,174,201,0.12)", "#222E33"
+else:
+    BG, INK, MUTED, RULE, PANEL = "#FFFFFF", "#1B2A32", "#5F6E76", "#DDE3E6", "#F2F5F6"
+    BLUE, BLUE_TINT, OCHRE = "#1F6F8B", "#A9C9D4", "#B8730F"
+    HEAT, AREA, GRID = ["#E9F1F4", "#6BA6BA"], "rgba(31,111,139,0.08)", "#EDF0F2"
 
 
 # ---------------------------------------------------------------- helpers ---
@@ -74,7 +80,7 @@ def style(fig: go.Figure, height: int) -> go.Figure:
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         showlegend=False,
-        hoverlabel=dict(bgcolor="white", bordercolor=RULE,
+        hoverlabel=dict(bgcolor=PANEL, bordercolor=RULE,
                         font=dict(family=FONT, size=13, color=INK)),
         bargap=0.38,
     )
@@ -103,7 +109,7 @@ def numbers_and_sql(df: pd.DataFrame, sql_name: str) -> None:
 st.html(f"""
 <style>
   header[data-testid="stHeader"], [data-testid="stToolbar"], footer {{ display: none; }}
-  .stApp {{ background: #FFFFFF; }}
+  .stApp {{ background: {BG}; }}
   .block-container {{ max-width: 1020px; padding: 4.5rem 2rem 6rem; }}
   html, body, .stApp, .stMarkdown, p, li, label, button, input {{
     font-family: {FONT}; color: {INK}; font-feature-settings: "tnum" 1;
@@ -370,7 +376,7 @@ fig = go.Figure(go.Heatmap(
     z=grid.values, x=[f"Days {30 * p + 1} to {30 * (p + 1)}" for p in grid.columns],
     y=[f"{m}  ({n} sellers)" for m, n in zip(order, sizes)],
     text=text, texttemplate="%{text}", textfont=dict(size=13, color=INK),
-    colorscale=[[0, "#E9F1F4"], [1, "#6BA6BA"]], zmin=0.1, zmax=0.45, showscale=False,
+    colorscale=[[0, HEAT[0]], [1, HEAT[1]]], zmin=0.1, zmax=0.45, showscale=False,
     xgap=3, ygap=3, hoverongaps=False,
     hovertemplate="<b>Signed %{y}</b><br>%{x} after signing<br>%{text} had a sale<extra></extra>"))
 style(fig, 60 + 44 * len(order))
@@ -444,10 +450,10 @@ fig.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode="lines", line=dict(color=RULE,
                          hoverinfo="skip"))
 fig.add_trace(go.Scatter(
     x=[0, *cc.cumulative_seller_share], y=[0, *cc.cumulative_gmv_share], mode="lines",
-    line=dict(color=BLUE, width=2.5), fill="tozeroy", fillcolor="rgba(31,111,139,0.08)",
+    line=dict(color=BLUE, width=2.5), fill="tozeroy", fillcolor=AREA,
     hovertemplate="Top %{x:.0%} of sellers<br>%{y:.0%} of revenue<extra></extra>"))
 fig.add_trace(go.Scatter(x=[0.10], y=[top10_share], mode="markers",
-                         marker=dict(color=OCHRE, size=11, line=dict(color="white", width=2)), hoverinfo="skip"))
+                         marker=dict(color=OCHRE, size=11, line=dict(color=BG, width=2)), hoverinfo="skip"))
 fig.add_annotation(x=0.10, y=top10_share, text=f"Top 10% of sellers<br>{pct(top10_share)} of revenue",
                    showarrow=False, xanchor="left", yanchor="top", xshift=14, yshift=-2, align="left",
                    font=dict(size=13.5, color=INK))
@@ -456,7 +462,7 @@ fig.add_annotation(x=0.72, y=0.72, text="If every seller sold the same", showarr
 style(fig, 380)
 fig.update_xaxes(tickformat=".0%", dtick=0.2, range=[0, 1.005], title=dict(
     text="Sellers, ranked from largest to smallest", font=dict(size=13, color=MUTED)))
-fig.update_yaxes(tickformat=".0%", dtick=0.25, range=[0, 1.03], showgrid=True, gridcolor="#EDF0F2",
+fig.update_yaxes(tickformat=".0%", dtick=0.25, range=[0, 1.03], showgrid=True, gridcolor=GRID,
                  tickfont=dict(color=MUTED, size=13))
 fig.update_layout(title=dict(text="Cumulative share of 90-day revenue", font=dict(size=13.5, color=MUTED, weight=400), x=0),
                   hovermode="x")
